@@ -83,7 +83,24 @@ Dataset bao gồm hơn 2.000 hình ảnh đa dạng về góc máy, độ sáng 
 
 ---
 
-## 🗂️ 5. Cấu Trúc Thư Mục Dự Án
+## 🧠 5. Các Trụ Cột Kiến Thức Track 4 Đã Vận Dụng
+
+Dự án sử dụng **4 trên 7 trụ cột** của Track 4. Bảng dưới chỉ rõ từng trụ cột nằm ở đâu trong hệ thống và vì sao team chọn cách làm đó.
+
+| Trụ cột | Nằm ở đâu trong hệ thống | Vì sao chọn cách này |
+| :--- | :--- | :--- |
+| **Học** | `TrainingYOLO.py`: fine-tune YOLO pretrained trên tập Roboflow Fall-Detection (2 lớp `fall` / `nonfall`). | Chỉ có thời gian ngắn và GPU 6GB nên không train từ đầu. Fine-tune model pretrained cho kết quả tốt hơn nhiều với ~2.000 ảnh. |
+| **Dữ liệu** | `convert_to_yolo.py`: chuyển nhãn CSV sang định dạng YOLO, loại box suy biến (`xmax <= xmin`), chuẩn hóa tọa độ về [0, 1]; chia train/val/test; `Report/labels_distribution.jpg`. | Nhãn sai hoặc box lỗi làm hỏng loss. Làm sạch trước khi train, và xem phân bố nhãn để biết hai lớp có cân bằng không. |
+| **Biểu diễn** | Đầu ra của model là bounding box + lớp (`fall` / `nonfall`) + độ tin cậy cho từng người trong khung hình. | Bounding box đủ để phân biệt người đang nằm với người đứng. Nó nhẹ hơn ước lượng khớp xương nên chạy được thời gian thực, đổi lại mất thông tin về tư thế chi tiết. |
+| **Bằng chứng** | Mục 3 (Precision, Recall, mAP@50, mAP@50-95, đồ thị loss) và mục 8 (ca lỗi và giới hạn). | Mỗi kết luận đều dựa trên số đo. Ca lỗi được nêu cùng nguyên nhân (góc nhìn từ trên xuống, bị che khuất, người nằm nghỉ chủ động). |
+
+**Về trụ cột Bất định:** ngưỡng `--conf 0.7` trong `InferenceYOLO.py` là cách xử lý độ tin cậy ở mức cơ bản: dự đoán dưới ngưỡng bị bỏ qua để giảm báo động giả, đổi lại có thể bỏ sót một số ca.
+
+**Chưa làm (hướng phát triển):** trụ cột **Thời gian** (chỉ báo động khi `fall` kéo dài liên tục, đo độ trễ từ ảnh đến cảnh báo) và **Hình học** (góc nghiêng thân người so với mặt sàn). Xem mục 8 (Hướng mở rộng tiếp theo).
+
+---
+
+## 🗂️ 6. Cấu Trúc Thư Mục Dự Án
 
 ```text
 K4-Track4-Capstone-Team-BetBetBet/
@@ -112,7 +129,7 @@ K4-Track4-Capstone-Team-BetBetBet/
 
 ---
 
-## ⚡ 6. Hướng Dẫn Cài Đặt & Chạy Trực Tiếp
+## ⚡ 7. Hướng Dẫn Cài Đặt & Chạy Trực Tiếp
 
 ### 🛠️ Bước 1: Chuẩn bị Môi trường
 
@@ -171,7 +188,7 @@ python InferenceYOLO.py --source 0 --show
 
 ---
 
-## 🧐 7. Đánh Giá Ca Lỗi & Hướng Phát Triển (Failure Cases & Future Work)
+## 🧐 8. Đánh Giá Ca Lỗi & Hướng Phát Triển (Failure Cases & Future Work)
 
 ### ⚠️ Phân tích Ca lỗi Thực tế (Failure Cases)
 1. **Góc máy thẳng đứng (Top-down view):** Khi camera gắn thẳng trên trần chiếu vuông góc xuống sàn, tư thế nằm và tư thế ngồi khoanh chân có tỷ lệ hình thể tương đồng, dễ gây nhiễu nhận diện.
@@ -185,7 +202,7 @@ python InferenceYOLO.py --source 0 --show
 
 ---
 
-## 👥 8. Đội Ngũ Thực Hiện (Team BetBetBet)
+## 👥 9. Đội Ngũ Thực Hiện (Team BetBetBet)
 
 - **Đơn vị:** Track 4 (Computer Vision & Robotics) — Vin Perception Hackathon
 - **Mã nguồn:** [GitHub Repository](https://github.com/anhkhoi130605/K4-Track4-Capstone-Team-BetBetBet)

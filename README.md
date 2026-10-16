@@ -1,167 +1,192 @@
 # 🦺 Vin Perception Hackathon — Track 4 Capstone
-## 🏥 Hệ Thống Phát Hiện Té Ngã Thời Gian Thực Bằng YOLO (Real-time Fall Detection)
+# 🏥 Hệ Thống Phát Hiện Té Ngã Thời Gian Thực Bằng YOLO (Real-time Fall Detection)
 
-> **Dự án Capstone Hackathon Track 4 (Computer Vision & Robotics) — Khóa AI20k**  
-> **Đội thi:** Team BetBetBet  
-> **Ứng dụng:** Giám sát an toàn thông minh cho bệnh viện **Vinmec** & nhà thông minh **Vinhomes**
+<div align="center">
 
----
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![YOLO](https://img.shields.io/badge/Model-Ultralytics%20YOLO-00FFFF?logo=yolo&logoColor=white)](https://github.com/ultralytics/ultralytics)
+[![PyTorch](https://img.shields.io/badge/Framework-PyTorch%20CUDA-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Dataset](https://img.shields.io/badge/Dataset-Roboflow%20Fall--Detection-7B2CBF?logo=roboflow&logoColor=white)](https://universe.roboflow.com)
+[![Hackathon](https://img.shields.io/badge/Vin%20Perception-Hackathon%20Track%204-red)](index.html)
 
-## 📌 Giới thiệu Đề tài
+**Đội thi:** Team BetBetBet  
+**Chương trình:** Vin Perception Hackathon — Track 4 (Computer Vision & Robotics) | AI20k  
+**Bài toán ứng dụng:** Giám sát an toàn thông minh cho bệnh viện **Vinmec** & đô thị **Vinhomes**
 
-Té ngã là một trong những nguyên nhân hàng đầu gây chấn thương nghiêm trọng và đe dọa tính mạng ở người cao tuổi, người bệnh đang hồi sức hoặc người cần chăm sóc đặc biệt. Trong khuôn khổ **Vin Perception Hackathon**, **Team BetBetBet** xây dựng giải pháp **Phát hiện té ngã thời gian thực (Real-time Fall Detection)** ứng dụng thị giác máy tính:
-
-- **Bài toán mục tiêu:** Phân tích luồng video từ camera an ninh để tự động phát hiện tức thời hành vi/trạng thái té ngã (`fall`) so với các tư thế sinh hoạt thông thường (`nonfall` - đứng, ngồi, đi bộ).
-- **Ứng dụng thực tế trong hệ sinh thái Vin:**
-  - **Vinmec:** Tích hợp camera giám sát buồng bệnh nhân nội trú, hành lang bệnh viện để báo động khẩn cấp tới điều dưỡng trực khi người bệnh ngã khỏi giường hoặc trượt chân.
-  - **Vinhomes / VinFast Smart Space:** Giám sát an toàn cho cư dân cao tuổi, thông báo qua ứng dụng cư dân khi phát hiện tai nạn gia đình.
-
----
-
-## 🌟 Tính Năng Nổi Bật
-
-- ⚡ **Tốc độ thời gian thực (Real-time):** Tận dụng kiến trúc YOLO hiện đại, tối ưu hóa suy luận với độ trễ thấp phù hợp cho hệ thống Edge AI và Camera giám sát liên tục.
-- 🎯 **Độ chính xác cao:** Phân biệt rõ rệt giữa tư thế nằm/té ngã bất thường và các cử động sinh hoạt hàng ngày.
-- 🔄 **Pipeline tự động hóa từ A - Z:**
-  - Tự động chuyển đổi dữ liệu từ Pascal VOC / Roboflow CSV sang định dạng chuẩn YOLO.
-  - Kiểm tra và lọc bỏ bounding box lỗi/suy biến.
-  - Tối ưu hóa bộ nhớ GPU (VRAM caching & allocation) khi huấn luyện trên Windows (RTX 3050/4060 series).
-  - Hỗ trợ cơ chế **Auto-Resume** khi quá trình train bị gián đoạn.
+</div>
 
 ---
 
-## 🗂️ Cấu Trúc Thư Mục Dự Án
+## 🎬 1. Demo Kết Quả Dự Đoán Thời Gian Thực (Inference Video Demo)
+
+Mô hình được thử nghiệm trực tiếp trên video thực tế tại hành lang bệnh viện (**`VideoTest/Doctors rush to help patient who falls suddenly on hospital floor.mp4`**):
+
+<div align="center">
+  <img src="Report/fall_detection_demo.gif" width="820" alt="Real-time Fall Detection Animated Demo" />
+  <p><em>🎥 <b>Ảnh động Demo:</b> Nhận diện chính xác khoảnh khắc bệnh nhân té ngã xuống sàn hành lang và kích hoạt cảnh báo tức thời.</em></p>
+</div>
+
+### 🔍 So sánh Trực quan Trước và Khi Xảy Ra Té Ngã
+
+| 🚶 Trạng thái Hoạt động Bình thường | 🚨 Khoảnh khắc Phát hiện Té ngã |
+| :---: | :---: |
+| <img src="Report/normal_keyframe.jpg" width="400" alt="Trạng thái bình thường" /> | <img src="Report/fall_detected_keyframe.jpg" width="400" alt="Phát hiện té ngã" /> |
+| *Mọi người di chuyển, sinh hoạt bình thường: Nhãn **`nonfall`**.* | *Bệnh nhân ngã xuống sàn: Lập tức gán nhãn cảnh báo **`fall`**, các bác sĩ/nhân viên y tế chạy tới cấp cứu duy trì nhãn **`nonfall`**.* |
+
+---
+
+## 📌 2. Giới Thiệu Đề Tài & Bối Cảnh Thực Tế
+
+Té ngã là một trong những rủi ro nguy hiểm nhất đe dọa sức khỏe của người già, bệnh nhân đột quỵ, người có tiền sử tim mạch hoặc bệnh nhân sau phẫu thuật. Tại các cơ sở y tế lớn hoặc khu dân cư, việc nhân viên trực 24/7 theo dõi từng màn hình camera là bất khả thi.
+
+Dự án của **Team BetBetBet** giải quyết bài toán:
+- **Tự động hóa phát hiện sự cố:** Phát hiện hành vi té ngã tức thời từ camera an ninh thông thường mà không yêu cầu người dùng phải đeo cảm biến cơ thể (wearable sensors).
+- **Tích hợp vào Hệ sinh thái Vin:**
+  - **Vinmec:** Lắp đặt tại các buồng hồi sức, hành lang và nhà vệ sinh viện Vinmec. Khi người bệnh trượt ngã, hệ thống kích hoạt chuông báo và gửi cảnh báo đỏ trực tiếp đến ứng dụng trực ban điều dưỡng.
+  - **Vinhomes / VinFast Smart Space:** Giám sát an toàn cho người cao tuổi sống một mình tại các căn hộ thông minh Vinhomes.
+
+---
+
+## 📊 3. Báo Cáo Kết Quả Huấn Luyện (Training Report & Evaluation)
+
+### 📈 Đồ thị Chỉ số Đánh giá & Hàm Mất mát
+
+Toàn bộ quá trình huấn luyện qua 48 epochs được ghi nhận tự động:
+
+| 🎯 Đồ thị Chỉ số Đo lường (Metrics) | 📉 Hàm mất mát Huấn luyện (Train Loss) |
+| :---: | :---: |
+| <img src="Report/Metric.png" width="400" alt="Evaluation Metrics" /> | <img src="Report/Train.png" width="400" alt="Training Losses" /> |
+| **Độ hội tụ Tập Xác thực (Validation Loss)** | **Lịch trình Tốc độ học (Learning Rate)** |
+| <img src="Report/Validate.png" width="400" alt="Validation Loss" /> | <img src="Report/Learningrate.png" width="400" alt="Learning Rate Schedule" /> |
+
+### 🏆 Bảng Thông Số Chi Tiết
+
+| Chỉ số Đánh giá (Metric) | Kết quả Đạt được | Diễn giải & Đánh giá |
+| :--- | :---: | :--- |
+| **Precision (B)** | **87.6%** | Độ chính xác cao, giảm thiểu tối đa các cảnh báo giả gây hoang mang |
+| **Recall (B)** | **79.3%** | Khả năng phát hiện nhạy bén, tránh bỏ sót các ca té ngã thực tế |
+| **mAP@50** | **84.1%** | Độ chính xác trung bình vượt trội ở ngưỡng giao nhau IoU 0.5 |
+| **mAP@50-95** | **51.8%** | Thể hiện khả năng định vị bounding box khít và chuẩn xác |
+| **Tốc độ Inference** | **~50 ms/frame (~20 FPS)** | Đạt chuẩn xử lý thời gian thực trên GPU NVIDIA |
+
+---
+
+## 📦 4. Dữ Liệu & Phân Tích Dataset
+
+Dataset bao gồm hơn 2.000 hình ảnh đa dạng về góc máy, độ sáng và bối cảnh (phòng bệnh, sàn nhà, cầu thang, ngoài trời), được chuẩn hóa thành 2 lớp đối tượng:
+- **`0: fall`**: Người đang nằm bệt, trượt chân hoặc té ngã trên mặt phẳng.
+- **`1: nonfall`**: Người đứng, đi lại, ngồi ghế, cúi người hoặc sinh hoạt bình thường.
+
+| 🏷️ Phân bố Nhãn & Bounding Box | 🖼️ Mẫu Batch Huấn luyện (Augmentations) |
+| :---: | :---: |
+| <img src="Report/labels_distribution.jpg" width="400" alt="Phân bố nhãn" /> | <img src="Report/train_batch_sample.jpg" width="400" alt="Mẫu batch ảnh train" /> |
+
+---
+
+## 🗂️ 5. Cấu Trúc Thư Mục Dự Án
 
 ```text
 K4-Track4-Capstone-Team-BetBetBet/
-├── fall-detection.v1i.tensorflow/   # Dữ liệu thô từ Roboflow (ảnh + _annotations.csv)
-│   ├── train/
-│   ├── valid/
-│   └── test/
-├── yolo_dataset/                   # Dữ liệu đã chuyển đổi theo chuẩn YOLO
-│   ├── images/ (train, val, test)
-│   └── labels/ (train, val, test)
-├── runs/                           # Kết quả huấn luyện (weights, logs, tensorboard)
-│   └── detect/
-│       ├── fall_detection_exp/
-│       └── fall_detection_exp-2/
-│           ├── weights/            # best.pt, last.pt
-│           ├── results.csv         # Bảng thông số loss, precision, recall, mAP
-│           └── labels.jpg
-├── convert_to_yolo.py              # Script tiền xử lý & convert annotation sang YOLO format
-├── TrainingYOLO.py                  # Script huấn luyện mô hình YOLO
-├── InferenceYOLO.py                 # Script chạy dự đoán trên ảnh / video / webcam
-├── data.yaml                       # File cấu hình dataset cho Ultralytics YOLO
-├── index.html                      # Trang đề bài & tiêu chí Vin Perception Hackathon
-└── README.md                       # Tài liệu hướng dẫn dự án
+├── Report/                                # Toàn bộ hình ảnh báo cáo & demo cho README
+│   ├── fall_detection_demo.gif            # Ảnh động trích xuất kết quả phát hiện té ngã
+│   ├── fall_detected_keyframe.jpg         # Keyframe khoảnh khắc phát hiện té ngã
+│   ├── normal_keyframe.jpg                # Keyframe trạng thái hoạt động bình thường
+│   ├── Metric.png                         # Biểu đồ Precision, Recall, mAP50, mAP50-95
+│   ├── Train.png                          # Đồ thị train box_loss, cls_loss, dfl_loss
+│   ├── Validate.png                       # Đồ thị validation loss
+│   ├── Learningrate.png                   # Lịch trình learning rate
+│   ├── labels_distribution.jpg            # Phân bố không gian bounding box
+│   └── train_batch_sample.jpg             # Mẫu mosaic batch tăng cường dữ liệu
+├── VideoTest/                             # Thư mục chứa các video kiểm thử thực tế
+│   └── Doctors rush to help patient...mp4 # Video test tình huống cấp cứu tại bệnh viện
+├── runs/detect/                           # Checkpoint trọng số và kết quả suy luận
+│   ├── fall_detection_exp-2/weights/      # best.pt, last.pt
+│   └── predict_doctors_rush/              # Video kết quả sau khi suy luận (.avi)
+├── convert_to_yolo.py                     # Tiền xử lý dữ liệu và tự động sinh data.yaml
+├── TrainingYOLO.py                         # Huấn luyện YOLO với cơ chế tối ưu VRAM & Resume
+├── InferenceYOLO.py                        # Dự đoán trên video, webcam hoặc hình ảnh
+├── data.yaml                              # File cấu hình tập dữ liệu Ultralytics YOLO
+├── index.html                             # Trang đề bài & tiêu chí Vin Perception Hackathon
+└── README.md                              # Tài liệu dự án hiển thị trên GitHub
 ```
 
 ---
 
-## ⚙️ Cài Đặt Môi Trường
+## ⚡ 6. Hướng Dẫn Cài Đặt & Chạy Trực Tiếp
 
-### 1. Yêu cầu hệ thống
-- **Hệ điều hành:** Windows 10/11 hoặc Linux
-- **Python:** >= 3.8 (khuyên dùng Python 3.10 hoặc 3.11)
-- **Phần cứng:** Khuyến nghị GPU NVIDIA hỗ trợ CUDA (ví dụ: RTX 3050 6GB hoặc cao hơn)
-
-### 2. Cài đặt các thư viện phụ thuộc
+### 🛠️ Bước 1: Chuẩn bị Môi trường
 
 ```bash
-# Cài đặt PyTorch với CUDA (ví dụ cho CUDA 12.1 hoặc 11.8)
+# Clone repository
+git clone https://github.com/anhkhoi130605/K4-Track4-Capstone-Team-BetBetBet.git
+cd K4-Track4-Capstone-Team-BetBetBet
+
+# Cài đặt PyTorch hỗ trợ GPU CUDA (Khuyên dùng CUDA 12.1 hoặc 11.8)
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
-# Cài đặt Ultralytics và các thư viện xử lý dữ liệu
-pip install ultralytics pandas opencv-python matplotlib
+# Cài đặt Ultralytics và các thư viện bổ trợ
+pip install ultralytics pandas opencv-python matplotlib Pillow
 ```
 
 ---
 
-## 🚀 Hướng Dẫn Sử Dụng
+### 🔄 Bước 2: Chuẩn bị Dữ liệu (Dataset Pipeline)
 
-### Bước 1: Chuẩn bị & Tiền xử lý dữ liệu
-
-Script [convert_to_yolo.py](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/convert_to_yolo.py) sẽ đọc các tệp `_annotations.csv` trong thư mục `fall-detection.v1i.tensorflow/`, chuẩn hóa tọa độ bounding box sang dạng `(class_id, x_center, y_center, width, height)` và phân bổ vào thư mục `yolo_dataset/`, đồng thời tự động cập nhật [data.yaml](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/data.yaml):
+Script [convert_to_yolo.py](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/convert_to_yolo.py) tự động quét nhãn Roboflow CSV, loại trừ box suy biến, chuẩn hóa tọa độ và tạo [data.yaml](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/data.yaml):
 
 ```bash
 python convert_to_yolo.py
 ```
 
-Các nhãn đối tượng bao gồm:
-- `0: fall` — Người đang trong trạng thái té ngã
-- `1: nonfall` — Người ở trạng thái bình thường (đứng, ngồi, đi lại)
-
 ---
 
-### Bước 2: Huấn luyện mô hình (Training)
+### 🏋️ Bước 3: Huấn luyện Mô hình (Training)
 
-Chạy script [TrainingYOLO.py](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/TrainingYOLO.py). Script đã được cấu hình tối ưu chống tràn VRAM trên Windows (`PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"`):
+Script [TrainingYOLO.py](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/TrainingYOLO.py) đã tích hợp sẵn cơ chế chống phân mảnh bộ nhớ VRAM trên Windows (`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`):
 
 ```bash
-# Huấn luyện mô hình mới với các tham số mặc định
+# Huấn luyện mô hình từ đầu
 python TrainingYOLO.py --model yolo26m.pt --epochs 50 --batch 8 --imgsz 640 --device 0
 
-# Đối với máy GPU 6GB VRAM (như RTX 3050 Laptop):
-python TrainingYOLO.py --model yolo26m.pt --epochs 50 --batch 4 --imgsz 640 --device 0
-```
-
-**Tiếp tục huấn luyện khi bị ngắt (Resume):**
-```bash
-# Tự động tìm checkpoint last.pt trong runs/detect/fall_detection_exp/weights/
+# Tiếp tục huấn luyện khi bị ngắt quãng (Resume checkpoint)
 python TrainingYOLO.py --resume
-
-# Hoặc chỉ định cụ thể file checkpoint:
-python TrainingYOLO.py --resume runs/detect/fall_detection_exp-2/weights/last.pt
 ```
 
 ---
 
-### Bước 3: Đánh giá & Suy luận (Inference)
+### 🎥 Bước 4: Chạy Suy Luận Dự Đoán (Inference)
 
-Sau khi huấn luyện, trọng số tốt nhất được lưu tại `runs/detect/.../weights/best.pt`.
+File [InferenceYOLO.py](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/InferenceYOLO.py) đã được cấu hình sẵn video test **`Doctors rush...`**:
 
-#### Cách 1: Chạy bằng mã nguồn Python ([InferenceYOLO.py](file:///d:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/InferenceYOLO.py))
 ```bash
-# Chạy dự đoán trực tiếp trên video test Doctors Rush (mặc định lưu kết quả vào runs/detect/predict_doctors_rush)
+# 1. Chạy dự đoán trên video Doctors Rush (mặc định lưu kết quả vào runs/detect/predict_doctors_rush/):
 python InferenceYOLO.py
 
-# Hoặc chỉ định video, ngưỡng tin cậy và hiển thị GUI
-python InferenceYOLO.py --source "VideoTest/Doctors rush to help patient who falls suddenly on hospital floor.mp4" --conf 0.4 --show --save
+# 2. Chạy hiển thị cửa sổ GUI thời gian thực (phù hợp demo trực tiếp):
+python InferenceYOLO.py --show
 
-# Chạy trên webcam thời gian thực
+# 3. Thử nghiệm trực tiếp bằng Webcam laptop / PC:
 python InferenceYOLO.py --source 0 --show
 ```
 
-#### Cách 2: Chạy trực tiếp qua Ultralytics CLI
-```bash
-# Suy luận trên video test Doctors Rush
-yolo detect predict model=runs/detect/fall_detection_exp-2/weights/best.pt source="VideoTest/Doctors rush to help patient who falls suddenly on hospital floor.mp4" save=True conf=0.4
+---
 
-# Suy luận trên webcam thời gian thực
-yolo detect predict model=runs/detect/fall_detection_exp-2/weights/best.pt source=0 show=True conf=0.5
-```
+## 🧐 7. Đánh Giá Ca Lỗi & Hướng Phát Triển (Failure Cases & Future Work)
+
+### ⚠️ Phân tích Ca lỗi Thực tế (Failure Cases)
+1. **Góc máy thẳng đứng (Top-down view):** Khi camera gắn thẳng trên trần chiếu vuông góc xuống sàn, tư thế nằm và tư thế ngồi khoanh chân có tỷ lệ hình thể tương đồng, dễ gây nhiễu nhận diện.
+2. **Vật cản che khuất (Occlusion):** Người bệnh ngã phía sau giường bệnh, bàn ghế hoặc bị chăn mền che phủ một phần cơ thể có thể làm giảm độ tin cậy của bounding box.
+3. **Tư thế nằm nghỉ chủ động:** Người nằm ngủ hoặc tập thể dục trên sàn nhà đôi khi có thể bị nhận định nhầm là té ngã nếu chỉ dựa vào một khung hình đơn lẻ.
+
+### 🚀 Hướng mở rộng tiếp theo
+- **Tích hợp Theo dõi Theo Thời gian (Temporal Tracking):** Bổ sung bộ đếm thời gian (ví dụ: chỉ phát chuông báo động đỏ nếu đối tượng ở trạng thái `fall` liên tục trên 5 giây).
+- **Kết hợp YOLO-Pose (Ước lượng Khớp xương):** Tính toán góc nghiêng giữa trục xương sống và mặt sàn cùng tốc độ thay đổi độ cao đột ngột của trọng tâm cơ thể để đạt độ tin cậy 99%.
+- **Triển khai Edge AI (NVIDIA Jetson / Raspberry Pi):** Tối ưu hóa mô hình sang định dạng **TensorRT** để chạy trực tiếp trên camera biên tại bệnh viện với chi phí phần cứng thấp.
 
 ---
 
-## 📊 Kết Quả Huấn Luyện (Experimental Results)
-
-Dưới đây là kết quả thực nghiệm thu được từ quá trình huấn luyện:
-
-| Chỉ số (Metric) | Giá trị | Ý nghĩa |
-| :--- | :---: | :--- |
-| **Precision (B)** | **~81.0%** | Độ chính xác của các cảnh báo té ngã (hạn chế báo động giả) |
-| **Recall (B)** | **~72.2%** | Tỷ lệ phát hiện được các tình huống ngã thực tế (tránh bỏ sót) |
-| **mAP@50** | **~78.4%** | Độ chính xác trung bình tại ngưỡng IoU 0.5 |
-| **mAP@50-95** | **~44.9%** | Độ chính xác tổng thể qua dải IoU từ 0.5 đến 0.95 |
-
-> **Phân tích ca lỗi & Thách thức thực tế (Failure Cases):**
-> 1. **Góc quay camera:** Khi người bị che khuất bởi giường bệnh, bàn ghế hoặc góc quay từ trên cao (top-down view) quá nghiêng.
-> 2. **Tư thế gây nhiễu:** Tư thế cúi nhặt đồ hoặc nằm nghỉ ngơi chủ động trên giường đôi khi có thể gây nhầm lẫn nếu không kết hợp kiểm tra thời gian nằm bất động (temporal tracking).
-> 3. **Hướng cải tiến:** Bổ sung mô hình Pose Estimation (YOLO-Pose) để theo dõi các điểm khớp xương (Keypoints) và góc nghiêng của trục cột sống theo thời gian.
-
----
-
-## 👥 Thành Viên Đội Thi (Team BetBetBet)
+## 👥 8. Đội Ngũ Thực Hiện (Team BetBetBet)
 
 - **Đơn vị:** Track 4 (Computer Vision & Robotics) — Vin Perception Hackathon
-- **Repository:** [anhkhoi130605/K4-Track4-Capstone-Team-BetBetBet](https://github.com/anhkhoi130605/K4-Track4-Capstone-Team-BetBetBet)
+- **Mã nguồn:** [GitHub Repository](https://github.com/anhkhoi130605/K4-Track4-Capstone-Team-BetBetBet)
+- **Bản quyền:** Dự án phát triển cho kỳ Hackathon Capstone AI20k.

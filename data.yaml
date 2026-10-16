@@ -1,0 +1,8 @@
+path: D:/VinUni/DeepTrack/K4-Track4-Capstone-Team-BetBetBet/yolo_dataset
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: fall
+  1: nonfall

@@ -1,0 +1,7 @@
+fall-detection.v1i.tensorflow/
+yolo_dataset/
+runs/
+fall-detection.v1i.tensorflow/
+__pycache__/
+.idea/
+yolo26m.pt

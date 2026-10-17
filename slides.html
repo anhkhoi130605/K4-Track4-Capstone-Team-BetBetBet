@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vinmec FallGuard AI — Slide Thuyết Trình Hackathon Track 4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090f1d;
+      --bg-card: rgba(18, 28, 48, 0.75);
+      --bg-card-hover: rgba(28, 42, 70, 0.85);
+      --border: rgba(94, 144, 219, 0.22);
+      --border-bright: rgba(56, 189, 248, 0.5);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --vin-blue: #1e3a8a;
+      --vin-blue-light: #3b82f6;
+      --vin-red: #c83538;
+      --vin-red-bright: #ef4444;
+      --cyan: #06b6d4;
+      --cyan-glow: #38bdf8;
+      --green: #10b981;
+      --amber: #f59e0b;
+      
+      --font-heading: 'Outfit', 'Be Vietnam Pro', -apple-system, sans-serif;
+      --font-body: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, monospace;
+      
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Top Control Bar */
+    header.control-bar {
+      height: 52px;
+      background: rgba(10, 18, 33, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-tag {
+      background: linear-gradient(135deg, var(--vin-red), #991b1b);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(200, 53, 56, 0.4);
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      color: #e2e8f0;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-sub {
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 400;
+      margin-left: 6px;
+      border-left: 1px solid var(--border);
+      padding-left: 10px;
+    }
+
+    /* Timer Widget */
+    .timer-widget {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 4px 16px;
+    }
+
+    .timer-display {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--cyan-glow);
+      letter-spacing: 0.05em;
+      min-width: 58px;
+    }
+
+    .timer-phase {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      max-width: 170px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .timer-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .timer-btn:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Top Actions */
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: var(--cyan);
+      color: white;
+    }
+
+    .action-btn.active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--cyan);
+      color: var(--cyan-glow);
+    }
+
+    .key-hint {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: var(--text-dim);
+    }
+
+    /* Main Deck Stage */
+    main.deck-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at 50% 30%, rgba(26, 47, 85, 0.45) 0%, rgba(9, 15, 29, 0.95) 75%);
+      overflow: hidden;
+      padding: 16px;
+    }
+
+    .slide-container {
+      width: 100%;
+      max-width: var(--slide-w);
+      aspect-ratio: 16 / 9;
+      position: relative;
+      background: rgba(11, 20, 38, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75), 0 0 35px rgba(56, 189, 248, 0.12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Slide Elements */
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 44px 56px 40px;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.97) translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+      z-index: 2;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .slide-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    .slide-title {
+      font-family: var(--font-heading);
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .slide-title span {
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-rubric-badge {
+      background: rgba(30, 58, 138, 0.4);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .slide-rubric-badge strong {
+      color: #ffffff;
+    }
+
+    /* Slide Body Layouts */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 3;
+      min-height: 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-1-2 {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-2-1 {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.45);
+      background: var(--bg-card-hover);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-accent-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--vin-red), var(--cyan));
+    }
+
+    .card h3 {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .card-list li {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .card-list li .bullet {
+      color: var(--cyan);
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Metrics Highlight Box */
+    .stat-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 36px;
+      font-weight: 700;
+      color: #38bdf8;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-value.highlight-green {
+      color: #34d399;
+      text-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+    }
+
+    .stat-value.highlight-red {
+      color: #f87171;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Image Preview in Slide */
+    .media-box {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .media-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+    }
+
+    .badge-live {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.4; }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* Code & Architecture Flow */
+    .code-box {
+      background: rgba(10, 15, 26, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #93c5fd;
+      line-height: 1.5;
+      overflow-x: auto;
+    }
+
+    .flow-steps {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .flow-step {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .flow-step::after {
+      content: '➔';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--cyan);
+      font-size: 14px;
+      z-index: 4;
+    }
+
+    .flow-step:last-child::after {
+      display: none;
+    }
+
+    .flow-step-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cyan);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .flow-step-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .flow-step-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Table styles */
+    .deck-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .deck-table th {
+      text-align: left;
+      padding: 8px 12px;
+      background: rgba(30, 41, 59, 0.6);
+      color: #94a3b8;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    .deck-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+    }
+
+    .deck-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Cover Slide Specifics */
+    .cover-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100%;
+      position: relative;
+      padding: 20px;
+    }
+
+    .cover-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(30, 58, 138, 0.4);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .cover-title {
+      font-family: var(--font-heading);
+      font-size: 48px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 900px;
+      letter-spacing: -0.02em;
+    }
+
+    .cover-title span {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-sub {
+      font-size: 18px;
+      color: #94a3b8;
+      max-width: 760px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .team-badge-row {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .team-badge {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .team-badge strong {
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .team-badge span {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* Bottom Status Bar */
+    footer.status-bar {
+      height: 48px;
+      background: rgba(10, 18, 33, 0.95);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: var(--vin-blue-light);
+      color: white;
+      border-color: var(--vin-blue-light);
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .slide-progress-bar {
+      flex: 1;
+      max-width: 380px;
+      height: 6px;
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 0 16px;
+    }
+
+    .slide-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--vin-blue-light), var(--cyan));
+      width: 10%;
+      transition: width 0.3s ease;
+    }
+
+    .time-slot-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* Presenter Notes Overlay */
+    .notes-drawer {
+      position: fixed;
+      bottom: 48px;
+      right: 24px;
+      width: 440px;
+      max-height: 280px;
+      background: rgba(10, 18, 33, 0.96);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-bright);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      display: none;
+      flex-direction: column;
+      z-index: 200;
+      overflow: hidden;
+    }
+
+    .notes-drawer.open {
+      display: flex;
+    }
+
+    .notes-header {
+      padding: 10px 16px;
+      background: rgba(30, 41, 59, 0.6);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notes-header h4 {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .notes-body {
+      padding: 16px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      overflow-y: auto;
+    }
+
+    .notes-body strong {
+      color: #38bdf8;
+    }
+
+    .notes-body em {
+      color: #fca5a5;
+      font-style: normal;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* Slide Thumbnails Drawer */
+    .thumbnails-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 300;
+      display: none;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .thumbnails-modal.open {
+      display: block;
+    }
+
+    .thumbnails-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .thumb-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .thumb-card:hover, .thumb-card.active {
+      border-color: var(--cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .thumb-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cyan);
+    }
+
+    .thumb-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 4px;
+    }
+
+    /* Print Styles for PDF Export */
+    @media print {
+      body {
+        overflow: visible;
+        background: #090f1d !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      header.control-bar, footer.status-bar, .notes-drawer, .thumbnails-modal {
+        display: none !important;
+      }
+      main.deck-stage {
+        padding: 0;
+        display: block;
+        background: none;
+      }
+      .slide-container {
+        max-width: 100%;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .slide {
+        position: relative !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        page-break-after: always;
+        height: 100vh;
+        width: 100vw;
+        display: flex !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation & Presentation Timer -->
+  <header class="control-bar">
+    <div class="brand">
+      <span class="brand-tag">Hackathon Track 4</span>
+      <span class="brand-title">Vinmec FallGuard AI</span>
+      <span class="brand-sub">Team BetBetBet · AI20k Capstone</span>
+    </div>
+
+    <!-- 10-Minute Presentation Timer -->
+    <div class="timer-widget">
+      <button class="timer-btn" id="btn-timer-toggle" title="Phát / Tạm dừng (Phím T)">
+        <span id="timer-icon">▶</span>
+      </button>
+      <div class="timer-display" id="timer-text">10:00</div>
+      <div class="timer-phase" id="timer-phase">Giai đoạn 1: Nỗi đau (0-1')</div>
+      <button class="timer-btn" id="btn-timer-reset" title="Đặt lại 10 phút">↺</button>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn" id="btn-thumbnails" title="Mục lục slide (Phím O)">
+        <span>Mục lục</span> <span class="key-hint">O</span>
+      </button>
+      <button class="action-btn" id="btn-notes" title="Lời thoại thuyết trình (Phím S)">
+        <span>Lời thoại</span> <span class="key-hint">S</span>
+      </button>
+      <button class="action-btn" id="btn-fullscreen" title="Toàn màn hình (Phím F)">
+        <span>Toàn màn hình</span> <span class="key-hint">F</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Deck Main Presentation Stage -->
+  <main class="deck-stage">
+    <div class="slide-container">
+
+      <!-- ================= SLIDE 1: COVER ================= -->
+      <section class="slide active" data-slide="1" data-time="0:00 - 1:00" data-phase="Mở đầu & Bối cảnh">
+        <div class="cover-content">
+          <div class="cover-tag">
+            <span>VIN PERCEPTION HACKATHON · TRACK 4 CAPSTONE</span>
+          </div>
+          <h1 class="cover-title">
+            Hệ Thống Giám Sát & Phát Hiện <span>Té Ngã Thời Gian Thực</span> Bằng AI
+          </h1>
+          <p class="cover-sub">
+            Giải pháp thị giác máy tính bảo vệ an toàn cho người bệnh tại <strong>Vinmec</strong> và cư dân cao tuổi tại <strong>Vinhomes Smart City</strong>.
+          </p>
+          <div class="team-badge-row">
+            <div class="team-badge">
+              <strong>Đội thi:</strong> <span>Team BetBetBet</span>
+            </div>
+            <div class="team-badge">
+              <strong>Mô hình:</strong> <span>YOLO Fall Detection + YOLO Pose</span>
+            </div>
+            <div class="team-badge">
+              <strong>Mục tiêu:</strong> <span>Thời gian thực · Độ trễ &lt; 50ms · Giảm 99% thời gian cứu hộ</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 2: BÀI TOÁN & NỖI ĐAU ================= -->
+      <section class="slide" data-slide="2" data-time="0:00 - 1:00" data-phase="Bài toán & Nỗi đau (15đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Bối cảnh y tế & thực tế vận hành</div>
+            <h2 class="slide-title">Nỗi Đau Y Tế: <span>Hội Chứng Nằm Sàn Kéo Dài</span> Tại Vinmec</h2>
+          </div>
+          <div class="slide-rubric-badge">Tiêu chí: <strong>Độ hữu ích</strong> (15 điểm)</div>
+        </div>
+        <div class="slide-body grid-3">
+          <div class="card">
+            <div class="card-accent-top"></div>
+            <h3>🚨 Rủi ro Té Ngã Nghiêm Trọng</h3>
+            <p>Té ngã là tai nạn số 1 ở bệnh nhân cao tuổi, hậu phẫu và đột quỵ tại bệnh viện. Sự cố thường diễn ra vào ban đêm khi tự đi vệ sinh hoặc trượt chân ở sàn ướt.</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> Nguy cơ chấn thương sọ não và gãy cổ xương đùi.</li>
+              <li><span class="bullet">▸</span> Khó khăn trong việc tự đứng dậy hoặc gọi chuông cấp cứu.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-color: rgba(239, 68, 68, 0.4);">
+            <div class="card-accent-top" style="background: var(--vin-red);"></div>
+            <h3 style="color: #fca5a5;">⏳ Hội Chứng Nằm Sàn (Long-Lie)</h3>
+            <p>Nếu bệnh nhân ngã nằm trên sàn quá <strong>1 giờ</strong> mà không được phát hiện:</p>
+            <ul class="card-list">
+              <li><span class="bullet" style="color: var(--vin-red-bright);">▸</span> Nguy cơ tử vong và suy thận cấp (tiêu cơ vân) tăng gấp <strong>5 LẦN</strong>.</li>
+              <li><span class="bullet" style="color: var(--vin-red-bright);">▸</span> Chu kỳ đi tuần của điều dưỡng ban đêm là <strong>45 - 60 phút</strong> tạo ra khoảng trống sinh tử.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top"></div>
+            <h3>🏥 Giải Pháp Vinmec FallGuard</h3>
+            <p>Ứng dụng camera giám sát thông minh có sẵn tại hành lang và phòng bệnh:</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> Tự động phát hiện té ngã <strong>dưới 15 giây</strong>.</li>
+              <li><span class="bullet">▸</span> Kích hoạt chuông còi báo động đỏ tại trạm trực điều dưỡng.</li>
+              <li><span class="bullet">▸</span> <strong>1 điều dưỡng</strong> có thể giám sát an toàn cùng lúc <strong>25 - 30 buồng bệnh</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 3: KIẾN TRÚC TOÀN HỆ THỐNG ================= -->
+      <section class="slide" data-slide="3" data-time="1:00 - 5:00" data-phase="Kiến trúc & Demo (25đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Luồng xử lý từ camera đến còi báo động</div>
+            <h2 class="slide-title">Kiến Trúc Hệ Thống: <span>Edge AI Pipeline</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Tiêu chí: <strong>Vận dụng kiến thức</strong> (25 điểm)</div>
+        </div>
+        <div class="slide-body">
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="flow-step-num">BƯỚC 01</div>
+              <div class="flow-step-title">Thu nhận Video</div>
+              <div class="flow-step-desc">Camera IP / Webcam 30 FPS</div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">BƯỚC 02</div>
+              <div class="flow-step-title">Tiền Xử Lý</div>
+              <div class="flow-step-desc">Resize 640x640, Normalization</div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">BƯỚC 03</div>
+              <div class="flow-step-title">YOLO Fall & Pose</div>
+              <div class="flow-step-desc">Bounding Box + 17 Khớp xương</div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">BƯỚC 04</div>
+              <div class="flow-step-title">Trích xuất Hình học & Thời gian</div>
+              <div class="flow-step-desc">Góc nghiêng θ, Vận tốc rơi Vy</div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">BƯỚC 05</div>
+              <div class="flow-step-title">FSM Quyết Định & Cảnh Báo</div>
+              <div class="flow-step-desc">Còi cấp cứu trạm trực Vinmec</div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>⚡ Tại Sao Chọn YOLO + Fine-tuning?</h3>
+              <p>Trong 2 giờ Hackathon và hạ tầng Edge GPU, không thể train mô hình 3D Action Recognition cồng kềnh (độ trễ 1-2s). YOLO mang lại:</p>
+              <ul class="card-list">
+                <li><span class="bullet">▸</span> Độ trễ cực thấp: <strong>~50ms / frame</strong> đạt chuẩn thời gian thực.</li>
+                <li><span class="bullet">▸</span> Khả năng triển khai biên trên NVIDIA Jetson hoặc IPC giá rẻ tại Vinmec.</li>
+                <li><span class="bullet">▸</span> Kết hợp cơ chế ngưỡng bất định (Confidence Threshold 0.7) loại bỏ nhiễu.</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>🔒 Bảo Mật Quyền Riêng Tư (HIPAA Compliant)</h3>
+              <p>Một ưu điểm quyết định khi triển khai tại buồng bệnh Vinmec:</p>
+              <ul class="card-list">
+                <li><span class="bullet">▸</span> Xử lý trực tiếp tại camera biên (On-device Processing).</li>
+                <li><span class="bullet">▸</span> Chỉ truyền metadata tọa độ khớp xương và sự kiện báo động, không lưu trữ video riêng tư của người bệnh.</li>
+                <li><span class="bullet">▸</span> Tuân thủ hoàn toàn quy định dữ liệu an toàn của Hackathon.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 4: DỮ LIỆU & HUẤN LUYỆN ================= -->
+      <section class="slide" data-slide="4" data-time="1:00 - 5:00" data-phase="Dữ liệu & Mô hình">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Trụ cột: Dữ liệu & Học</div>
+            <h2 class="slide-title">Chuẩn Hóa Dữ Liệu & <span>Quy Trình Huấn Luyện</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Trụ cột: <strong>Dữ liệu & Học</strong></div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>📦 Pipeline Làm Sạch & Chuyển Đổi Nhãn</h3>
+            <p>Tập dữ liệu Roboflow Fall Detection gồm hơn <strong>2.000 hình ảnh</strong> đa góc nhìn, được xử lý qua script <code>convert_to_yolo.py</code>:</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> <strong>Lọc Bounding Box suy biến:</strong> Tự động loại trừ các box lỗi do người gán nhãn ($x_{max} \le x_{min}$ hoặc $y_{max} \le y_{min}$).</li>
+              <li><span class="bullet">▸</span> <strong>Chuẩn hóa tọa độ:</strong> Quy đổi tọa độ tuyệt đối về $[0, 1]$ theo chuẩn Ultralytics.</li>
+              <li><span class="bullet">▸</span> <strong>Chia tập:</strong> 70% Train, 20% Validation, 10% Test.</li>
+              <li><span class="bullet">▸</span> <strong>Cân bằng 2 lớp:</strong> <code>0: fall</code> (nằm bệt, ngã) và <code>1: nonfall</code> (đứng, ngồi, đi).</li>
+            </ul>
+            <div class="media-box" style="height: 140px; margin-top: 10px;">
+              <img src="Report/labels_distribution.jpg" alt="Phân bố nhãn" />
+              <span class="media-label">labels_distribution.jpg</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>🏋️ Huấn Luyện Tối Ưu Hóa Bộ Nhớ VRAM</h3>
+            <p>Huấn luyện qua <strong>48 Epochs</strong> với script <code>TrainingYOLO.py</code>:</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> <strong>Chống tràn bộ nhớ Windows:</strong> Cấu hình <code>PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True</code> giúp chạy mượt mà trên GPU 6GB.</li>
+              <li><span class="bullet">▸</span> <strong>Data Augmentation:</strong> Tự động áp dụng Mosaic, Random Flip, Color Jitter để tăng khả năng chống chịu điều kiện ánh sáng yếu tại phòng bệnh.</li>
+              <li><span class="bullet">▸</span> <strong>Cơ chế Resume Checkpoint:</strong> Lưu tự động <code>best.pt</code> và <code>last.pt</code> sau mỗi epoch, tránh mất mát khi gặp sự cố điện toán.</li>
+            </ul>
+            <div class="media-box" style="height: 140px; margin-top: 10px;">
+              <img src="Report/train_batch_sample.jpg" alt="Mẫu batch train" />
+              <span class="media-label">train_batch_sample.jpg (Mosaic Batch)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 5: KẾT QUẢ ĐO LƯỜNG & METRICS ================= -->
+      <section class="slide" data-slide="5" data-time="5:00 - 7:00" data-phase="Bằng chứng & Số đo (10đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Trụ cột Bằng chứng: Kiểm chứng bằng số đo</div>
+            <h2 class="slide-title">Bằng Chứng Thực Nghiệm: <span>Metrics Đánh Giá</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Tiêu chí: <strong>Bằng chứng</strong> (10 điểm)</div>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4" style="margin-bottom: 16px;">
+            <div class="stat-badge">
+              <div class="stat-value highlight-green">87.6%</div>
+              <div class="stat-label">Precision (B)</div>
+              <div class="stat-sub">Độ chuẩn xác cao, tối thiểu báo giả</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-value highlight-green">79.3%</div>
+              <div class="stat-label">Recall (B)</div>
+              <div class="stat-sub">Độ nhạy phát hiện, không lọt ca ngã</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-value">84.1%</div>
+              <div class="stat-label">mAP@50</div>
+              <div class="stat-sub">Chính xác trung bình ở IoU 0.5</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-value">~50 ms</div>
+              <div class="stat-label">Inference Speed</div>
+              <div class="stat-sub">Đạt 20 - 32 FPS thời gian thực</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="media-box" style="height: 240px;">
+              <img src="Report/Metric.png" alt="Biểu đồ Metrics" />
+              <span class="media-label">Report/Metric.png (Precision, Recall, mAP50, mAP50-95)</span>
+            </div>
+            <div class="media-box" style="height: 240px;">
+              <img src="Report/Train.png" alt="Đồ thị hàm mất mát Train Loss" />
+              <span class="media-label">Report/Train.png (Hội tụ Box Loss, Cls Loss, Dfl Loss)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 6: 4 TRỤ CỘT TRACK 4 ================= -->
+      <section class="slide" data-slide="6" data-time="5:00 - 7:00" data-phase="Trụ cột Track 4 (25đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Yêu cầu bắt buộc: Dùng ít nhất 2 trụ cột</div>
+            <h2 class="slide-title">Vận Dụng <span>4 Trụ Cột Cốt Lõi</span> Của Track 4</h2>
+          </div>
+          <div class="slide-rubric-badge">Vận dụng kiến thức: <strong>Xuất sắc (25đ)</strong></div>
+        </div>
+        <div class="slide-body grid-4">
+          <div class="card">
+            <div class="card-accent-top" style="background: #38bdf8;"></div>
+            <h3>1. Trụ Cột: Học</h3>
+            <p><strong>Vị trí:</strong> <code>TrainingYOLO.py</code></p>
+            <p style="margin-top: 8px;">Fine-tune YOLO pretrained trên 2.000+ ảnh té ngã. Thay vì train từ đầu tốn nhiều ngày, transfer learning tận dụng các đặc trưng hình học có sẵn để đạt mAP 84.1% trong thời gian thi đấu.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top" style="background: #10b981;"></div>
+            <h3>2. Trụ Cột: Dữ Liệu</h3>
+            <p><strong>Vị trí:</strong> <code>convert_to_yolo.py</code></p>
+            <p style="margin-top: 8px;">Lọc bỏ box suy biến, chuẩn hóa tọa độ về [0, 1]. Phân tích biểu đồ phân bố nhãn để tránh bias giữa người đứng và người nằm. Tuân thủ dữ liệu an toàn tuyệt đối.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top" style="background: #f59e0b;"></div>
+            <h3>3. Trụ Cột: Biểu Diễn</h3>
+            <p><strong>Vị trí:</strong> Model Output & FSM</p>
+            <p style="margin-top: 8px;">Thế giới được biểu diễn qua Bounding Box + Tỷ lệ W/H + 17 điểm khớp xương giải phẫu. Máy trạng thái hữu hạn (FSM) biểu diễn các pha té ngã thay vì phán đoán đơn khung hình.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top" style="background: #ef4444;"></div>
+            <h3>4. Trụ Cột: Bằng Chứng</h3>
+            <p><strong>Vị trí:</strong> Evaluation & Failure Cases</p>
+            <p style="margin-top: 8px;">Mọi nhận định đều có số đo kiểm chứng (Precision 87.6%, Recall 79.3%). Chỉ ra tường minh các ca lỗi thực tế, nguyên nhân gốc rễ và giới hạn của hệ thống.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 7: LIVE & VIDEO DEMO ================= -->
+      <section class="slide" data-slide="7" data-time="1:00 - 5:00" data-phase="Live Demo Trực tiếp (25đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Demo chạy thật trên video bệnh viện</div>
+            <h2 class="slide-title">Minh Họa Thực Nghiệm: <span>Video Hành Lang Bệnh Viện</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Demo chạy được: <strong>Xuất sắc (25đ)</strong></div>
+        </div>
+        <div class="slide-body grid-2-1">
+          <div class="media-box" style="height: 100%;">
+            <img src="Report/fall_detection_demo.gif" alt="Demo GIF Té Ngã Hành Lang Bệnh Viện" />
+            <div class="badge-live"><span class="pulse-dot"></span> REAL-TIME INFERENCE DEMO</div>
+            <span class="media-label">VideoTest/Doctors rush to help patient who falls suddenly.mp4</span>
+          </div>
+
+          <div class="card" style="justify-content: center;">
+            <h3>🔍 Phân Tích Tình Huống Suy Luận</h3>
+            <ul class="card-list">
+              <li>
+                <span class="bullet">1.</span>
+                <span><strong>Trước khi ngã:</strong> Mọi người đi lại bình thường, bounding box màu xanh gán nhãn <code>nonfall</code>.</span>
+              </li>
+              <li>
+                <span class="bullet" style="color: var(--vin-red-bright);">2.</span>
+                <span><strong>Khoảnh khắc tiếp sàn:</strong> Bệnh nhân ngã bệt, hệ thống lập tức chuyển sang bounding box đỏ <code>fall (conf: 0.8+)</code>.</span>
+              </li>
+              <li>
+                <span class="bullet">3.</span>
+                <span><strong>Bác sĩ chạy lại cấp cứu:</strong> Các y bác sĩ đứng vây quanh hỗ trợ vẫn được nhận diện chuẩn xác là <code>nonfall</code>, không bị nhiễu chéo đối tượng.</span>
+              </li>
+            </ul>
+            <div class="code-box" style="margin-top: 14px;">
+              $ python InferenceYOLO.py --show<br>
+              >>> [INFERENCE] Conf=0.7 | FPS=20.4 | Device=CUDA:0
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 8: CA LỖI & GIỚI HẠN ================= -->
+      <section class="slide" data-slide="8" data-time="5:00 - 7:00" data-phase="Phân tích Ca lỗi & Giới hạn (10đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Bắt buộc: Một số đo, một ca lỗi & giải thích</div>
+            <h2 class="slide-title">Phân Tích Ca Lỗi & <span>Giới Hạn Hệ Thống</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Tiêu chí: <strong>Bằng chứng</strong> (Ca lỗi thực tế)</div>
+        </div>
+        <div class="slide-body grid-3">
+          <div class="card">
+            <div class="card-accent-top" style="background: var(--amber);"></div>
+            <h3 style="color: #fcd34d;">⚠️ Ca Lỗi 1: Góc Máy Thẳng Đứng</h3>
+            <p><strong>Hiện tượng:</strong> Camera gắn vuông góc từ trần nhà chiếu thẳng xuống sàn (Top-down view).</p>
+            <p style="margin-top: 8px;"><strong>Nguyên nhân:</strong> Chiếu phối cảnh làm méo dạng hình học. Bounding box của người ngồi khoanh chân và người nằm ngửa có tỷ lệ $W/H$ tương tự nhau, dễ gây phân loại sai.</p>
+            <p style="margin-top: 8px; color: var(--cyan);"><strong>Khắc phục:</strong> Khuyến nghị góc camera nghiêng 30° - 45° so với phương ngang.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top" style="background: var(--amber);"></div>
+            <h3 style="color: #fcd34d;">⚠️ Ca Lỗi 2: Bị Che Khuất (Occlusion)</h3>
+            <p><strong>Hiện tượng:</strong> Người bệnh ngã phía sau thành giường, bàn ghế hoặc bị chăn mền che nửa thân.</p>
+            <p style="margin-top: 8px;"><strong>Nguyên nhân:</strong> Mất các đặc trưng diện mạo chính của cơ thể khiến confidence score tụt xuống dưới ngưỡng 0.70.</p>
+            <p style="margin-top: 8px; color: var(--cyan);"><strong>Khắc phục:</strong> Bổ sung Optical Flow và phát hiện chuyển động đột ngột của đầu/vai.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top" style="background: var(--amber);"></div>
+            <h3 style="color: #fcd34d;">⚠️ Ca Lỗi 3: Nằm Nghỉ Chủ Động</h3>
+            <p><strong>Hiện tượng:</strong> Người nằm ngủ hoặc tập thể dục trên sàn nhà (Yoga, hít đất).</p>
+            <p style="margin-top: 8px;"><strong>Nguyên nhân:</strong> Nếu chỉ nhìn 1 khung hình đơn lẻ, tư thế hoàn toàn là <code>fall</code>.</p>
+            <p style="margin-top: 8px; color: var(--cyan);"><strong>Khắc phục:</strong> Dùng trụ cột <strong>Thời gian</strong> (Temporal FSM): phải có xung vận tốc rơi $V_y > 260\text{ px/s}$ trước đó mới kích hoạt còi đỏ.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 9: TÁC ĐỘNG & QUY MÔ TRIỂN KHAI ================= -->
+      <section class="slide" data-slide="9" data-time="5:00 - 7:00" data-phase="Tác động tại Vin (15đ)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Ước tính hiệu quả kinh tế & y tế</div>
+            <h2 class="slide-title">Tác Động Định Lượng <span>Tại Hệ Sinh Thái Vin</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Tiêu chí: <strong>Impact</strong> (15 điểm)</div>
+        </div>
+        <div class="slide-body grid-3">
+          <div class="card">
+            <div class="card-accent-top"></div>
+            <h3>🏥 1. Triển Khai Tại Vinmec</h3>
+            <p>Tại các bệnh viện quốc tế Vinmec Times City, Central Park:</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> <strong>Rút ngắn thời gian phát hiện:</strong> Từ <strong>45 phút</strong> (chu kỳ đi tuần) xuống <strong>dưới 15 giây</strong>.</li>
+              <li><span class="bullet">▸</span> <strong>Cấp cứu trong giờ vàng:</strong> Giảm <strong>75%</strong> biến chứng nặng (xuất huyết não, sốc chấn thương, tiêu cơ vân).</li>
+              <li><span class="bullet">▸</span> <strong>Tối ưu nhân sự:</strong> 1 điều dưỡng trực đêm kiểm soát an toàn 25 - 30 buồng bệnh.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top"></div>
+            <h3>🏙️ 2. Triển Khai Tại Vinhomes</h3>
+            <p>Tích hợp vào căn hộ thông minh Vinhomes Smart City & Ocean Park:</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> Bảo vệ người cao tuổi sống một mình hoặc người bệnh tim mạch.</li>
+              <li><span class="bullet">▸</span> Tự động gửi thông báo khẩn cấp đến App VinID / Ban quản lý tòa nhà và người thân trong gia đình.</li>
+              <li><span class="bullet">▸</span> Không yêu cầu người già phải đeo vòng cảm biến vướng víu hay quên sạc pin.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-accent-top"></div>
+            <h3>💰 3. Hiệu Quả Đầu Tư (ROI)</h3>
+            <p>Chi phí triển khai cực thấp so với giải pháp ngoại nhập:</p>
+            <ul class="card-list">
+              <li><span class="bullet">▸</span> <strong>Tận dụng 100% camera IP sẵn có</strong> của bệnh viện và tòa nhà, không cần mua mới phần cứng camera.</li>
+              <li><span class="bullet">▸</span> <strong>Edge Computing:</strong> Chỉ cần 1 máy chủ mini trang bị GPU RTX / Jetson xử lý đồng thời 8 - 16 luồng camera.</li>
+              <li><span class="bullet">▸</span> Nâng tầm chứng chỉ an toàn y tế quốc tế <strong>JCI</strong> của Vinmec.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 10: KỊCH BẢN 10 PHÚT & PHÂN VAI ================= -->
+      <section class="slide" data-slide="10" data-time="7:00 - 10:00" data-phase="Kịch bản 10 phút">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Phân bổ chiến thuật theo đề bài Ban Tổ Chức</div>
+            <h2 class="slide-title">Kịch Bản Thuyết Trình <span>10 Phút Chuẩn Chỉ</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Tiêu chí: <strong>Trình bày & Hỏi đáp</strong> (10 điểm)</div>
+        </div>
+        <div class="slide-body">
+          <table class="deck-table">
+            <thead>
+              <tr>
+                <th style="width: 110px;">THỜI LƯỢNG</th>
+                <th style="width: 170px;">PHÂN VAI</th>
+                <th>NỘI DUNG TRÌNH BÀY CHI TIẾT</th>
+                <th style="width: 150px;">TIÊU CHÍ CHẤM</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color: var(--cyan);">01 Phút</strong><br><small>0:00 - 1:00</small></td>
+                <td><strong>Thành viên 1</strong><br>(Trưởng nhóm)</td>
+                <td>Nêu bài toán người già/bệnh nhân té ngã tại Vinmec, Hội chứng nằm sàn kéo dài (>1h tăng tử vong x5). Giới thiệu Vinmec FallGuard AI.</td>
+                <td>Độ hữu ích<br><strong>(15 điểm)</strong></td>
+              </tr>
+              <tr>
+                <td><strong style="color: #34d399;">04 Phút</strong><br><small>1:00 - 5:00</small></td>
+                <td><strong>Thành viên 2 + 3</strong><br>(Kỹ thuật & Demo)</td>
+                <td>
+                  <strong>Demo chạy thật:</strong> Trình chiếu suy luận video hành lang bệnh viện + Live test trước webcam. Mô phỏng ca cúi nhặt đồ (không báo giả) và ca ngã thật (kích hoạt còi đỏ tức thì).
+                </td>
+                <td>Demo chạy được<br><strong>(25 điểm)</strong></td>
+              </tr>
+              <tr>
+                <td><strong style="color: #f59e0b;">02 Phút</strong><br><small>5:00 - 7:00</small></td>
+                <td><strong>Thành viên 1</strong></td>
+                <td>Chỉ rõ 4 Trụ cột đã dùng (Học, Dữ liệu, Biểu diễn, Bằng chứng). Đọc 1 số đo (Precision 87.6%, 50ms), giải thích 1 ca lỗi (Top-down view) và ước tính Impact tại Vin.</td>
+                <td>Vận dụng & Bằng chứng<br><strong>(35 điểm)</strong></td>
+              </tr>
+              <tr>
+                <td><strong style="color: #f87171;">03 Phút</strong><br><small>7:00 - 10:00</small></td>
+                <td><strong>Cả 3 thành viên</strong></td>
+                <td>Hội đồng Giám khảo hỏi đáp. Mọi thành viên tự tin trả lời về phần việc của mình và toàn bộ hệ sinh thái giải pháp.</td>
+                <td>Trình bày & Q&A<br><strong>(10 điểm)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= SLIDE 11: BÍ KÍP TRẢ LỜI Q&A ================= -->
+      <section class="slide" data-slide="11" data-time="7:00 - 10:00" data-phase="Hỏi đáp Giám khảo (Q&A)">
+        <div class="slide-header">
+          <div>
+            <div class="slide-eyebrow">Chuẩn bị trước các câu hỏi khó nhất</div>
+            <h2 class="slide-title">Bí Kíp Trả Lời <span>Hội Đồng Giám Khảo (Q&A)</span></h2>
+          </div>
+          <div class="slide-rubric-badge">Mục tiêu: <strong>Thuyết phục tuyệt đối</strong></div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3 style="color: #38bdf8;">❓ Q1: "Tại sao không dùng Action Recognition 3D (SlowFast/I3D)?"</h3>
+            <p><strong>Trả lời:</strong> Mô hình 3D cồng kềnh, độ trễ 1-2 giây, đòi hỏi GPU đắt tiền. Ngược lại, YOLO + Temporal FSM chỉ mất ~50ms, chạy được trên Edge Camera giá rẻ tại mỗi phòng bệnh Vinmec, đồng thời dễ giải thích cơ chế bằng toán học (Explainable AI).</p>
+          </div>
+
+          <div class="card">
+            <h3 style="color: #38bdf8;">❓ Q2: "Lắp camera buồng bệnh có vi phạm quyền riêng tư?"</h3>
+            <p><strong>Trả lời:</strong> Hệ thống chạy Edge Computing tại camera, chỉ trích xuất tọa độ bounding box/khớp xương. Toàn bộ hình ảnh gốc không hề bị lưu trữ hay tải lên Internet, tuân thủ nghiêm ngặt tiêu chuẩn bảo mật y tế HIPAA và Vinmec.</p>
+          </div>
+
+          <div class="card">
+            <h3 style="color: #38bdf8;">❓ Q3: "Người bệnh nằm lên giường ngủ có bị còi báo động không?"</h3>
+            <p><strong>Trả lời:</strong> Tọa độ trọng tâm khi nằm trên giường ở nửa trên của khung hình ($Y_{hip} < 0.5$). Khi té ngã xuống sàn, $Y_{hip}$ nằm sát đáy ảnh kết hợp xung gia tốc rơi $V_y$. Trạm trực có thể khoanh vùng 'Safety Bed Zone' để lọc triệt để.</p>
+          </div>
+
+          <div class="card">
+            <h3 style="color: #38bdf8;">❓ Q4: "Hệ thống làm gì khi camera bị mờ sương hoặc thiếu sáng?"</h3>
+            <p><strong>Trả lời:</strong> Model được huấn luyện với kỹ thuật Mosaic Augmentation tăng độ tương phản. Trong Inference, ngưỡng Confidence Threshold 0.70 đảm bảo khi hình ảnh quá nhiễu, hệ thống chuyển sang chế độ nghi ngờ và cảnh báo lỗi camera.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Bottom Navigation & Counter -->
+  <footer class="status-bar">
+    <div class="nav-controls">
+      <button class="nav-btn" id="btn-prev" title="Slide trước (Mũi tên Trái)">❮</button>
+      <button class="nav-btn" id="btn-next" title="Slide sau (Mũi tên Phải, Space)">❯</button>
+      <span class="slide-counter" id="slide-num">1 / 11</span>
+    </div>
+
+    <div class="slide-progress-bar">
+      <div class="slide-progress-fill" id="progress-bar"></div>
+    </div>
+
+    <div class="time-slot-pill" id="time-slot-display">
+      ⏱ 0:00 - 1:00 · Mở đầu
+    </div>
+  </footer>
+
+  <!-- Presenter Speaker Notes Drawer -->
+  <aside class="notes-drawer" id="notes-drawer">
+    <div class="notes-header">
+      <h4>🎙️ Lời thoại gợi ý cho người thuyết trình</h4>
+      <button class="timer-btn" id="btn-close-notes">✕</button>
+    </div>
+    <div class="notes-body" id="notes-content">
+      <!-- Dynamic notes loaded via JS -->
+    </div>
+  </aside>
+
+  <!-- Slide Thumbnails Modal -->
+  <div class="thumbnails-modal" id="thumbnails-modal">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 20px;">
+      <h3 style="font-family: var(--font-heading); font-size: 20px; color: #fff;">Danh Sách 11 Slide Thuyết Trình</h3>
+      <button class="action-btn" id="btn-close-thumbnails">Đóng (Esc)</button>
+    </div>
+    <div class="thumbnails-grid" id="thumbnails-grid"></div>
+  </div>
+
+  <script>
+    // Presenter Notes Data for each slide
+    const slideNotes = {
+      1: "<strong>[Thành viên 1 - Bìa]:</strong> Kính chào Ban giám khảo và các thầy cô. Hôm nay Team BetBetBet xin đại diện Track 4 Computer Vision & Robotics trình bày dự án Vinmec FallGuard AI — Hệ thống phát hiện té ngã thời gian thực phục vụ bài toán an toàn tại bệnh viện Vinmec và khu đô thị Vinhomes.",
+      2: "<strong>[Thành viên 1 - Nỗi đau]:</strong> Tại các cơ sở Vinmec, té ngã là tai nạn nguy hiểm nhất ở người già và sau phẫu thuật. Nhưng nỗi đau lớn nhất là 'Hội chứng nằm sàn kéo dài' (Long-lie syndrome): Nếu ngã nằm trên sàn quá 1 tiếng mà không ai biết, nguy cơ tử vong và suy thận cấp tăng gấp 5 lần. Điều dưỡng trực đêm đi tuần cách nhau 45-60 phút nên tạo ra khoảng trống sinh tử. Giải pháp của chúng em rút ngắn thời gian phát hiện từ 45 phút xuống dưới 15 giây!",
+      3: "<strong>[Thành viên 2 - Kiến trúc]:</strong> Toàn bộ luồng xử lý chạy thời gian thực: Video từ camera IP được tiền xử lý, đưa qua mô hình YOLO fine-tune để phát hiện box và 17 khớp xương. Điểm đặc sắc là chúng em kết hợp trích xuất hình học và máy trạng thái FSM để quyết định, đảm bảo độ trễ chỉ 50ms và bảo mật tuyệt đối quyền riêng tư HIPAA cho người bệnh.",
+      4: "<strong>[Thành viên 2 - Dữ liệu]:</strong> Dữ liệu gồm 2.000 ảnh từ Roboflow. Chúng em viết script convert_to_yolo.py để loại bỏ các box suy biến xmax <= xmin gây hỏng hàm loss, chuẩn hóa tọa độ về [0, 1]. Khi huấn luyện trên Windows, cấu hình expandable_segments giúp tận dụng tối đa VRAM GPU 6GB, train 48 epochs hội tụ xuất sắc.",
+      5: "<strong>[Thành viên 1 - Metrics]:</strong> Về trụ cột Bằng chứng, kết quả đo lường khách quan đạt: Precision 87.6% giúp loại bỏ báo động giả; Recall 79.3% đảm bảo không bỏ sót ca té ngã thực tế; mAP@50 đạt 84.1%. Tốc độ suy luận đạt 50ms/khung hình, hoàn toàn đáp ứng thời gian thực 20-30 FPS trên GPU NVIDIA.",
+      6: "<strong>[Thành viên 1 - 4 Trụ cột]:</strong> Hệ thống vận dụng 4 trên 7 trụ cột của Track 4: (1) Học: Transfer learning YOLO trên 2.000 ảnh; (2) Dữ liệu: Làm sạch nhãn, phân tích phân bố tọa độ; (3) Biểu diễn: Bounding box và 17 điểm khớp xương; (4) Bằng chứng: Đo lường số liệu chuẩn và nêu rõ ca lỗi.",
+      7: "<strong>[Thành viên 2/3 - Live Demo]:</strong> Xin mời Ban giám khảo theo dõi video thực nghiệm hành lang bệnh viện: Khi người bệnh ngã xuống, bounding box đỏ lập tức kích hoạt. Khi các bác sĩ chạy lại cấp cứu, hệ thống vẫn duy trì nhãn nonfall chuẩn xác cho các bác sĩ mà không bị nhầm lẫn đối tượng!",
+      8: "<strong>[Thành viên 1 - Ca lỗi]:</strong> Theo tiêu chí bắt buộc '1 số đo, 1 ca lỗi', chúng em chỉ rõ 3 ca lỗi: Góc camera thẳng đứng từ trên trần (Top-down view) làm tỷ lệ người ngồi và nằm tương đồng nhau; Ca bị chăn mền che khuất một phần cơ thể; và Ca người nằm tập thể dục trên sàn. Chúng em giải quyết bằng cửa sổ thời gian FSM và bổ sung đặc trưng quang lưu.",
+      9: "<strong>[Thành viên 1 - Impact]:</strong> Về tác động thực tế: Giúp Vinmec cứu chữa bệnh nhân trong giờ vàng, giảm 75% biến chứng nặng sau té ngã. 1 điều dưỡng trực đêm có thể giám sát an toàn 25-30 phòng. Giải pháp tận dụng camera IP sẵn có nên chi phí phần cứng cực rẻ.",
+      10: "<strong>[Thành viên 1 - Kịch bản 10 phút]:</strong> Nhóm chúng em đã phân vai rõ ràng: 1 phút mở đầu, 4 phút demo chạy thật, 2 phút phân tích kỹ thuật số đo & ca lỗi, và 3 phút dành trọn vẹn cho phần hỏi đáp của Hội đồng.",
+      11: "<strong>[Cả đội - Q&A]:</strong> Chúng em đã chuẩn bị sẵn sàng giải đáp mọi câu hỏi kỹ thuật từ Hội đồng về Action Recognition so với YOLO Pose, bài toán quyền riêng tư HIPAA, và cơ chế chống báo động giả khi bệnh nhân nằm lên giường."
+    };
+
+    // Slide Management
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 1;
+
+    const slideNumEl = document.getElementById('slide-num');
+    const progressBar = document.getElementById('progress-bar');
+    const timeSlotDisplay = document.getElementById('time-slot-display');
+    const notesContent = document.getElementById('notes-content');
+    const notesDrawer = document.getElementById('notes-drawer');
+    const thumbnailsModal = document.getElementById('thumbnails-modal');
+    const thumbnailsGrid = document.getElementById('thumbnails-grid');
+
+    function updateSlide(newSlide) {
+      if (newSlide < 1 || newSlide > totalSlides) return;
+      
+      slides.forEach(s => s.classList.remove('active'));
+      const activeSlide = document.querySelector(`.slide[data-slide="${newSlide}"]`);
+      if (activeSlide) {
+        activeSlide.classList.add('active');
+        currentSlide = newSlide;
+        
+        slideNumEl.textContent = `${currentSlide} / ${totalSlides}`;
+        progressBar.style.width = `${(currentSlide / totalSlides) * 100}%`;
+        
+        const timeSlot = activeSlide.getAttribute('data-time') || '';
+        const phase = activeSlide.getAttribute('data-phase') || '';
+        timeSlotDisplay.textContent = `⏱ ${timeSlot} · ${phase}`;
+        
+        // Update Speaker Notes
+        notesContent.innerHTML = slideNotes[currentSlide] || "Không có ghi chú cho slide này.";
+      }
+    }
+
+    document.getElementById('btn-prev').addEventListener('click', () => updateSlide(currentSlide - 1));
+    document.getElementById('btn-next').addEventListener('click', () => updateSlide(currentSlide + 1));
+
+    // Keyboard Navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        updateSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        updateSlide(currentSlide - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        updateSlide(1);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        updateSlide(totalSlides);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 's' || e.key === 'S') {
+        toggleNotes();
+      } else if (e.key === 'o' || e.key === 'O') {
+        toggleThumbnails();
+      } else if (e.key === 'Escape') {
+        thumbnailsModal.classList.remove('open');
+      } else if (e.key === 't' || e.key === 'T') {
+        toggleTimer();
+      }
+    });
+
+    // Fullscreen Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+    document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
+
+    // Notes Toggle
+    function toggleNotes() {
+      notesDrawer.classList.toggle('open');
+      document.getElementById('btn-notes').classList.toggle('active');
+    }
+    document.getElementById('btn-notes').addEventListener('click', toggleNotes);
+    document.getElementById('btn-close-notes').addEventListener('click', toggleNotes);
+
+    // Thumbnails Drawer
+    function toggleThumbnails() {
+      thumbnailsModal.classList.toggle('open');
+      if (thumbnailsModal.classList.contains('open')) {
+        renderThumbnails();
+      }
+    }
+    document.getElementById('btn-thumbnails').addEventListener('click', toggleThumbnails);
+    document.getElementById('btn-close-thumbnails').addEventListener('click', toggleThumbnails);
+
+    function renderThumbnails() {
+      thumbnailsGrid.innerHTML = '';
+      slides.forEach((s, idx) => {
+        const slideIndex = idx + 1;
+        const titleEl = s.querySelector('.slide-title') || s.querySelector('.cover-title');
+        const titleText = titleEl ? titleEl.textContent.trim().replace(/\s+/g, ' ') : `Slide ${slideIndex}`;
+        
+        const card = document.createElement('div');
+        card.className = `thumb-card ${slideIndex === currentSlide ? 'active' : ''}`;
+        card.innerHTML = `
+          <div class="thumb-num">SLIDE ${slideIndex < 10 ? '0' + slideIndex : slideIndex}</div>
+          <div class="thumb-title">${titleText}</div>
+        `;
+        card.addEventListener('click', () => {
+          updateSlide(slideIndex);
+          thumbnailsModal.classList.remove('open');
+        });
+        thumbnailsGrid.appendChild(card);
+      });
+    }
+
+    // 10-Minute Presentation Countdown Timer
+    let totalSeconds = 600; // 10 minutes
+    let timerInterval = null;
+    let isRunning = false;
+
+    const timerText = document.getElementById('timer-text');
+    const timerPhase = document.getElementById('timer-phase');
+    const timerIcon = document.getElementById('timer-icon');
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function updateTimerDisplay() {
+      timerText.textContent = formatTime(totalSeconds);
+
+      // Phase calculation
+      const elapsed = 600 - totalSeconds;
+      if (elapsed < 60) {
+        timerPhase.textContent = 'GĐ 1: Nỗi đau (0-1\')';
+        timerText.style.color = 'var(--cyan-glow)';
+      } else if (elapsed < 300) {
+        timerPhase.textContent = 'GĐ 2: Live Demo (1-5\')';
+        timerText.style.color = '#34d399';
+      } else if (elapsed < 420) {
+        timerPhase.textContent = 'GĐ 3: Kỹ thuật & Impact (5-7\')';
+        timerText.style.color = '#fcd34d';
+      } else {
+        timerPhase.textContent = 'GĐ 4: Giám khảo Q&A (7-10\')';
+        timerText.style.color = '#f87171';
+      }
+
+      if (totalSeconds <= 0) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        timerIcon.textContent = '▶';
+        timerPhase.textContent = 'HẾT 10 PHÚT';
+      }
+    }
+
+    function toggleTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        timerIcon.textContent = '▶';
+      } else {
+        if (totalSeconds <= 0) totalSeconds = 600;
+        isRunning = true;
+        timerIcon.textContent = '⏸';
+        timerInterval = setInterval(() => {
+          if (totalSeconds > 0) {
+            totalSeconds--;
+            updateTimerDisplay();
+          }
+        }, 1000);
+      }
+    }
+
+    document.getElementById('btn-timer-toggle').addEventListener('click', toggleTimer);
+    document.getElementById('btn-timer-reset').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      isRunning = false;
+      timerIcon.textContent = '▶';
+      totalSeconds = 600;
+      updateTimerDisplay();
+    });
+
+    // Initialize
+    updateSlide(1);
+    updateTimerDisplay();
+  </script>
+</body>
+</html>
